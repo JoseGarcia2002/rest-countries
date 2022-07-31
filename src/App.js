@@ -1,25 +1,36 @@
-import logo from './logo.svg';
 import './App.css';
+import Query from "./components/Query"
+import Countries from "./components/Countries"
 
-function App() {
+import {useState, useEffect} from "react"
+
+import axios from "axios"
+
+const App = () => {
+  const [countries, setCountries] = useState([])
+  const [query, setQuery] = useState("")
+
+  useEffect(() => {
+    axios
+      .get("https://restcountries.com/v3.1/all")
+      .then(response => {
+        setCountries(response.data)
+      })
+  }, [])
+
+  const handleQuery = (event) => {
+    setQuery(event.target.value)
+  }
+
+  const countriesToShow = countries.filter(country => country.name.common.includes(query))
+  const showCountry = countries.filter(country => country.name.official === query)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <Query onChange={handleQuery}/>
+      <Countries countries={(showCountry.length === 1) ? showCountry : countriesToShow} setQuery={setQuery}/>
+    </>
+  )
 }
 
 export default App;
